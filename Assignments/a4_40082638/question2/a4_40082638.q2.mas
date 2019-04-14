@@ -1,0 +1,196 @@
+////////////////////////////////////////////////////////////////////////////////
+///////////////////               QUESTION 2               /////////////////////
+////////////////////////////////////////////////////////////////////////////////
+                ORG         000
+                JnS         main
+                Store       exitCode
+                Jump        exit                / exit(main())
+
+/ Input: none
+/ Output: Return value that's sent as the exit code to the program
+main,           Clear
+                Load        promptAddr
+                Store       printfpNext
+                JnS         printf              / printf("Enter a passphrase: ")
+                Load        N8
+                Store       func1pX
+                JnS         func1               / func1(8)
+mainEnd,        Load        N0
+                JumpI       main                / return 0
+
+/ Input:
+/    - pX - The length passed from main
+/ Output: void
+func1,          Clear
+                Load        func1yAddr
+                Store       scanfpNext
+                JnS         scanf               / scanf(y)
+                Load        func1yAddr
+                Store       strlenpNext
+                JnS         strlen              / strlen(y)
+                Subt        func1pX
+func1IfCond,    Skipcond    400                 / if (strlen(y) != x)
+                Jump        func1End            /     else
+                Jump        func1Err            /     then
+func1Err,       Load        N1
+                Store       exitCode
+                Jump        exit                / exit(1)
+func1End,       Clear
+                JumpI       func1
+
+/ Input:
+/     pNext1 - The starting mem addr of the string
+/ Output: void
+printf,         Clear
+printfLoopCond, Clear
+                AddI        printfpNext         / Load next value into acc
+                Subt        nullTerm            / subtract the null terminator code
+                Skipcond    400                 / Will only be 0 if the character is \
+                Jump        printfLoopBody      / If not \, continue to body of loop
+                JumpI       printf              / Otherwise, break from loop
+printfLoopBody, Clear
+                AddI        printfpNext         / Load the memory address into acc
+                Output                          / Print the character
+                Load        printfpNext         / Load the next memory address
+                Add         N1                  / Increment the address
+                Store       printfpNext         / Store it in the next address pointer
+                Jump        printfLoopCond      / Go back to beginning of loop
+
+/ Input:
+/     pNext2 - the starting mem addr of the string
+/ Output: the length of the string
+/ NOTE:
+/     The null terminator is not included as the length of the string.
+/     If someone enters "password" then length will be 8
+/     Even though the string is *stored* as "password\"
+strlen,         Clear
+strlenLoopCond, Clear
+                AddI        strlenpNext         / Load the value at starting address
+                Subt        nullTerm            / Subtract null terminator
+                Skipcond    400                 / Check if this was null terminator
+                Jump        strlenLoopBody      / If not, Jump to body
+                Jump        strlenEnd
+strlenLoopBody, Clear                           / Set acc to 0
+                Load        strlenpNext         / Set acc to the current mem addr
+                Add         N1                  / Move to the next mem addr
+                Store       strlenpNext         / Store it back
+                Load        strlenLen           / Load the output length
+                Add         N1                  / Add 1 to the length
+                Store       strlenLen           / Store the length
+                Jump        strlenLoopCond      / Continue looping over characters
+strlenEnd,      Load        strlenLen
+                JumpI       strlen
+
+/ Input: The memory address of the variable to input into
+/ Output: void
+scanf,          Clear
+scanfDoWhile,   Input                           / Prompt user for input.
+                Store       scanfInput          / Store the input
+                StoreI      scanfpNext          / Store the input at the next mem addr
+                Load        scanfpNext          / Load the mem addr for curr input
+                Add         N1                  / Add one for next input addr
+                Store       scanfpNext          / Store it as next mem addr
+                Load        scanfInput          / Load the user's input
+                Subt        nullTerm            / subtract null terminator's value
+                Skipcond    400                 / Check if it's a null terminator
+                Jump        scanfPrintIn        / Continue to the body if it is
+                Jump        scanfEnd            / Exit subroutine
+scanfPrintIn,   Load        scanfInput
+                Output
+                Jump        scanfDoWhile
+scanfEnd,       JumpI       scanf
+
+/ Input:
+/     exitCode - The exit code for the program. 0: pass, 1: fail (POSIX standard)
+/ Output: N/A, kills the program
+exit,           Clear
+                Load        exitMsgAddr
+                Store       printfpNext
+                JnS         printf              / printf("Exit code: ")
+                Load        exitCode
+                Skipcond    400                 / if (exitCode == 0)
+                Jump        exitSuccess         /     then
+                Jump        exitFail            /     else
+exitSuccess,    Load        Uni0
+                Output                          / Print 0
+                Halt
+exitFail,       Load        Uni1
+                Output                          / Print 1
+                Halt
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////              DECLARATIONS              ////////////////////
+////////////////////////////////////////////////////////////////////////////////
+/ Constants
+Uni0,           HEX         30
+Uni1,           HEX         31
+N0,             DEC         0
+N1,             DEC         1
+N8,             DEC         8
+newline,        HEX         0a
+nullTerm,       HEX         5C                  / Null termination: "\"
+
+/ main's variables.
+promptAddr,     HEX         61                  / Starting Address
+prompt,         HEX         45                  / E
+                HEX         6E                  / n
+                HEX         74                  / t
+                HEX         65                  / e
+                HEX         72                  / r
+                HEX         20
+                HEX         61                  / a
+                HEX         20
+                HEX         70                  / p
+                HEX         61                  / a
+                HEX         73                  / s
+                HEX         73                  / s
+                HEX         70                  / p
+                HEX         68                  / h
+                HEX         72                  / r
+                HEX         61                  / a
+                HEX         73                  / s
+                HEX         65                  / e
+                HEX         3A                  / :
+                HEX         0A                  / New line
+                HEX         5C                  / NULL termination
+
+/ func1 variables
+func1pX,        DEC         0                   / Param: size of password allowed
+func1yAddr,     HEX         78                  / starting mem addr of lY
+func1y,         DEC         0                   / Local variable Y
+                DEC         0
+                DEC         0
+                DEC         0
+                DEC         0
+                DEC         0
+                DEC         0
+                DEC         0
+                DEC         0
+
+/ printf's variables
+printfpNext,    DEC         0                   / Param: first mem addr of string
+
+/ scanf variables
+scanfpNext,     DEC         0                   / Param: starting address to store into
+scanfInput,     DEC         0                   / Local: The user's current input
+
+/ strlen variables
+strlenpNext,    DEC         0                   / The starting address of the string
+strlenLen,      DEC         0                   / The outputed length
+
+/ Exit
+exitCode,       DEC         0                   / Param: 0 - success, else - fail
+exitMsgAddr,    HEX         88
+exitMsg,        HEX         A                   / New line
+                HEX         45                  / E
+                HEX         78                  / x
+                HEX         69                  / i
+                HEX         74                  / t
+                HEX         20
+                HEX         63                  / c
+                HEX         6f                  / o
+                HEX         64                  / d
+                HEX         65                  / e
+                HEX         3a                  / :
+                HEX         20
+                HEX         5C                  / \

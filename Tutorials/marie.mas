@@ -1,0 +1,162 @@
+/-- 4 bits for opcode, 12 bits for address/operands
+/--  __________
+/-- |          |  <--- 0
+/-- |          |  <--- ...
+/-- | MAIN MEM |       Can use between address 0 to 4095
+/-- |          |
+/-- |          |  <--- ...
+/-- |__________|  <--- 4095
+
+
+
+ORG 100 			/-- START ADDRESSING AT 100
+Load X				/-- LOAD X INTO REGISTER 104
+Add Y				/-- ADD VALUE FROM 105
+Store Z	 			/-- STORE OUTPUT IN 106
+Output 				/-- OUTPUT CONTENT OF REGISTER 106
+Halt
+
+/-- Declarations
+X, DEC 2			/-- 104
+Y, DEC 3			/-- 105
+Z, DEC 0			/-- 106
+
+/--/////////////////////////////////////////////////////////////////////////////
+/--/////////////////           EXAMPLE 2                    ////////////////////
+/--/////////////////////////////////////////////////////////////////////////////
+/-- CODE
+		ORG 		000			/-- START ADDRESSING AT LOCATION 0
+		LOAD 		A			/-- LOAD FROM ADDRESS A
+		Add 		B			/-- ADD ADDRESS B TO A
+		Subt 		C			/-- SUBTRACT FROM ADDRESS C FROM B
+		Store 		X			/-- STORE CONTENTS IN X
+		Output					/-- OUTPUT CONTENTS OF X
+		Clear
+		Output
+		Halt
+
+/-- DECLARATIONS
+A, 		DEC 		10			/-- LOAD 10 INTO ADDRESS A
+B, 		DEC 		10			/-- LOAD 10 INTO ADDRESS B
+C, 		DEC 		7			/-- LOAD 7 INTO ADDRESS C
+X, 		DEC 		0			/-- LOAD 0 INTO ADDRESS X
+
+/--/////////////////////////////////////////////////////////////////////////////
+/--/////////////////           EXAMPLE 3                    ////////////////////
+/--/////////////////////////////////////////////////////////////////////////////
+			ORG 			000				/-- START ACCUMULATOR AT ADDRESS 0
+            Load  			X				/-- LOAD 20 FROM ADDRESS X INTO THE ACCUMULATOR
+            Subt 			Y				/-- SUBTRACT ADDRESS Y FROM ACCUMULATOR
+	        Skipcond 		800				/-- IF ACCUMULATOR IS LESS THAN OR EQUAL TO 0
+			Jump  			ELSE 			/-- X IS LESS THAN 0
+
+IF,		    Load 			X				/-- X IS GREATER THAN 0
+            Add 			ONE				/-- ADD 1 TO THE ACCUMULATOR
+            Store 			X				/-- STORE THE VALUE OF THE ACCUMULATOR INTO ADDRESS X
+            Output							/-- PRINT THE VALUE OF THE ACCUMULATOR
+            JUMP 			END
+
+ELSE,       Load  			Y				/-- LOAD VALUE OF Y INTO THE ACCUMULATOR
+			Add 			ONE				/-- ADD THE VALUE 1 INTO THE ACCUMULATOR
+			Store  			Y				/-- STORE THE VALUE OF THE ACCUMULATOR INTO THE ADDRESS Y
+            Load 			X				/-- LOAD X INTO THE ACCUMULATOR
+            Output							/-- OUTPUT ACCUMULATOR
+			Load 			Y				/-- LOAD Y INTO THE ACCUMULATOR
+            OUTPUT							/-- OUTPUT ACCUMULATOR
+
+END, 		HALT
+
+/-- DECLARATIONS
+X, 			DEC				20
+Y, 			DEC				10
+ONE,		DEC				1
+
+
+/--/////////////////////////////////////////////////////////////////////////////
+/--/////////////////           EXAMPLE 4                    ////////////////////
+/--/////////////////////////////////////////////////////////////////////////////
+				ORG			000			/-- START ADDRESSING AT MEMORY LOCATION 0
+                Load 		ADDR		/-- LOAD THE VALUE OF ADDRESS INTO ACCUMULATOR
+				Store 		NEXT		/-- STORE THE VALUE OF THE ACCUMULATOR INTO NEXT
+LOOP, 			Clear					/-- CLEAR ACCUMULATOR
+				AddI 		NEXT		/-- ADD VALUE AT MEMORY LOCATION OF NEXT TO ACCUMULATOR
+				Output					/-- OUTPUT VALUE OF ACCUMULATOR
+				Load 		NEXT		/-- LOAD VALUE OF ACCUMULATOR INTO NEXT
+				Add 		ONE			/-- ADD ONE TO THE VALUE OF THE ACCUMULATOR
+				Store 		NEXT		/-- STORE THE VALUE OF THE ACCUMULATOR INTO NEXT
+				Load 		COUNT		/-- LOAD THE VALUE OF COUNT INTO THE ACCUMULATOR
+				Subt 		ONE			/-- SUBTRACT ONE FROM THE VALUE OF THE ACCUMULATOR
+                Store 		COUNT		/-- STORE THE VALUE OF THE ACCUMULATOR INTO COUNT
+				Skipcond 	400			/-- CHECK IF ACCUMULATOR IS 0
+                Jump 		LOOP		/-- IF NOT, CONTINUE THE LOOP
+				Halt					/-- IF SO, HALT
+
+/-- DECLARATIONS
+NEXT, 			DEC			0
+ADDR, 			HEX			012
+COUNT,			DEC			5
+ONE,			DEC			1
+/-- THIS IS THE METHOD OF DECLARING ARRAYS. THIS IS A CHAR ARRAY CONTAINING "HELLO"
+A0,				HEX			068			/-- H
+				HEX			065 		/-- E
+                HEX			06C			/-- L
+                HEX			06C			/-- L
+                HEX			06F			/-- O
+
+/--/////////////////////////////////////////////////////////////////////////////
+/--/////////////////           EXAMPLE 5                    ////////////////////
+/--/////////////////////////////////////////////////////////////////////////////
+				JnS 			PrintVariableX
+				Load 			X
+				Add 			Y
+				Store			X
+				JnS 			PrintVariableX
+				Halt
+
+/-- "FUNCTION"
+PrintVariableX, HEX				000						/-- Store return address in 000
+				LOAD 			X
+                OUTPUT
+
+/-- Exit Subroutine PrintVariableX
+                JumpI 			PrintVariableX
+
+/-- DECLARATIONS
+X, 				DEC				42
+Y, 				DEC				5
+
+
+/--/////////////////////////////////////
+/--///////////////// Making an adder
+/--/////////////////////////////////////
+				JnS 			ADDER
+				Output
+                Store 			X
+                Jns				ADDER
+                Output
+				Halt
+
+/-- "FUNCTION"
+ADDER, 			HEX				000						/-- Store return address in 000
+				LOAD 			X
+                Add 			Y
+
+
+/-- Exit Subroutine PrintVariableX
+                JumpI 			ADDER
+
+/-- DECLARATIONS
+X, 				DEC				42
+Y, 				DEC				5
+
+
+
+
+
+
+
+
+
+
+
+

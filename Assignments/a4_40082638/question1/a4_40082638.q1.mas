@@ -1,0 +1,145 @@
+////////////////////////////////////////////////////////////////////////////////
+///////////////////               QUESTION 1               /////////////////////
+////////////////////////////////////////////////////////////////////////////////
+                ORG	        000
+                JnS         main                / Start main method
+                Store       exitCode            / Store output of main as exitCode
+                Jump        exit                / Jump to exit.
+
+startVal,       DEC         14
+
+main,           Clear
+                Load        startVal
+                Store       x                   / x = startVal
+                Subt        N5
+mainIfCond,     Skipcond    000                 / if x < 5
+                Jump        mainGte5            / 	else
+                Jump        mainLt5	            / 	then
+mainLt5,        Load        x
+                Subt        N2
+                Store       y                   / y = x-2
+                Load        N20
+                Store       x                   / x = 20
+                Jump        mainEndIf
+mainGte5,       Load        x
+                Store       pBase               / base = x
+                Load        N3
+                Store       pExp                / exponent = 3
+                JnS         pow
+                Store       y                   / y = pow(x, 3)
+                Store       p1                  / p1 = y
+                Load        Neg1
+                Store       p2                  / p2 = -1
+                JnS         mult
+                Store       y                   / y = mult(-1, pow(x, 3))
+                Load        N8
+                Store       x                   / x = 8
+mainEndIf,      Load        x
+                Output                          / Print x
+                Load        y
+                Output                          / Print y
+mainEnd,        Load        N0                  / \
+                Store       exitCode            /  |>> return 0
+                JumpI       main                / /
+
+/ Input:
+/ 	p1 - The first integer
+/ 	p2 - The second integer
+/ Output: The result of the multiplication
+mult,           Clear
+                Load        N0
+                Store       multVal             / multVal = 0
+multP1Eq0,      Load        p1
+                Skipcond    400                 / if p1 == 0
+                Jump        multLoopP2Neq0      / 	else
+                Jump        multEnd             / 	then return 0
+multLoopP2Neq0, Load        p2
+                Skipcond    400                 / while p2 != 0
+                Jump        multLoopBody
+                Jump        multEnd
+multLoopBody,   Load        p2
+                Skipcond    000	                / if p2 < 0
+                Jump        multPos             / else
+                Jump        multNeg             / then
+multNeg,        Load        multVal             / \
+                Subt        p1                  /  |>> multVal -= p1
+                Store       multVal             / /
+                Load        p2                  / \
+                Add         N1                  /  |>> p2++
+                Store       p2                  / /
+                Jump        multLoopP2Neq0
+multPos,        Load        multVal             / \
+                Add         p1                  /  |>> multVal += p1
+                Store       multVal             / /
+                Load        p2                  / \
+                Subt        N1                  /  |>> p2--
+                Store       p2                  / /
+                Jump        multLoopP2Neq0
+multEnd,        Load        multVal
+                JumpI       mult                / return multVal
+
+/ Input:
+/ 	pBase - The base for the operation
+/ 	pExp - The exponent for the operation
+/ Output: Integer result of the exponent operation
+/ NOTE: exits with -1 when a negative exponent is received
+pow,            Clear
+                Load        N1
+                Store       powVal              / powVal = 1
+                Load        pExp
+                Skipcond    000                 / if exp < 0
+                Jump        powLoopCond         / 	else
+                Jump        powErr              / 	then throw error
+powLoopCond,    Load        pExp
+                Skipcond    400                 / while exp != 0
+                Jump        powLoopBody         / 	do
+                Jump        powEnd              / 	return powVal
+powLoopBody,    Load        pBase
+                Store       p1                  / p1 = base
+                Load        powVal
+                Store       p2                  / p2 = powVal
+                JnS         mult
+                Store       powVal              / powVal = mult(base, powVal)
+                Load        pExp                / \
+                Subt        N1                  /  |>> pExp--
+                Store       pExp                / /
+                Jump        powLoopCond         / Go back to loop condition
+powErr,         Load        Neg1
+                Store       exitCode            / exit(-1)
+                Jump        exit
+powEnd,         Load        powVal
+                JumpI       pow                 / return powVal
+
+exit,           Clear
+                Load        exitCode
+                Output
+                Halt
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////              DECLARATIONS              ////////////////////
+////////////////////////////////////////////////////////////////////////////////
+x,              DEC         20
+y,              DEC         0
+
+/ mult variables                                / mult(a, b)
+p1,             DEC         0                   / Param: a
+p2,             DEC         0                   / Param: b
+multVal,        DEC         0                   / The working value returned
+
+/ pow variables                                 / pow(base, exp) -> base ^ exp
+pBase,          DEC         0                   / Param: The base for the calc
+pExp,           DEC         0                   / Param: The exponent to raise to
+powVal,         DEC         0                   / The current working value returned
+
+/ Constants
+Neg1,           DEC         -1
+N0,             DEC         0
+N1,             DEC         1
+N2,             DEC         2
+N3,             DEC         3
+N5,             DEC         5
+N8,             DEC         8
+N20,            DEC         20
+
+/ reserved variables
+exitCode,       DEC         0                   / Param: 0 - success, else - fail

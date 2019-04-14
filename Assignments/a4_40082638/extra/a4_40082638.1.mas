@@ -1,0 +1,500 @@
+////////////////////////////////////////////////////////////////////////////////
+///////////////////               QUESTION 1               /////////////////////
+////////////////////////////////////////////////////////////////////////////////
+                ORG         000
+                JnS         main        / Start main method
+                Store       exitPCode   / Store output of main as exitCode
+                Jump        exit        / Jump to exit.
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////              DECLARATIONS              ////////////////////
+////////////////////////////////////////////////////////////////////////////////
+/ Declarations are before code so that I don't need to change the starting memory
+/ value of arrays every time I change my code
+startXAddr,     HEX         4
+startX,         HEX         53              / S
+                HEX         74              / t
+                HEX         61              / a
+                HEX         72              / r
+                HEX         74              / t
+                HEX         69              / i
+                HEX         6e              / n
+                HEX         67              / g
+                HEX         20
+                HEX         78              / x
+                HEX         20
+                HEX         76              / v
+                HEX         61              / a
+                HEX         6c              / l
+                HEX         75              / u
+                HEX         65              / e
+                HEX         3a              / :
+                HEX         20
+                HEX         5C              / EOS
+
+printXAddr,     HEX         18
+printX,         HEX         58              / X
+                HEX         3a              / :
+                HEX         20
+                HEX         5C              / EOS
+
+printYAddr,     HEX         1D
+printY,         HEX         0A
+                HEX         59              / Y
+                HEX         3a              / :
+                HEX         20
+                HEX         5C              / EOS
+
+powErrAddr,     HEX         23
+powErrMsg,      HEX         45              / E
+                HEX         72              / r
+                HEX         72              / r
+                HEX         6f              / o
+                HEX         72              / r
+                HEX         3a              / ,
+                HEX         20
+                HEX         44              / d
+                HEX         6f              / o
+                HEX         20
+                HEX         6e              / n
+                HEX         6f              / o
+                HEX         74              / t
+                HEX         20
+                HEX         73              / s
+                HEX         75              / u
+                HEX         70              / p
+                HEX         70              / p
+                HEX         6f              / o
+                HEX         72              / r
+                HEX         74              / t
+                HEX         20
+                HEX         6e              / n
+                HEX         65              / e
+                HEX         67              / g
+                HEX         61              / a
+                HEX         74              / t
+                HEX         69              / i
+                HEX         76              / v
+                HEX         65              / e
+                HEX         20
+                HEX         65              / e
+                HEX         78              / x
+                HEX         70              / p
+                HEX         6f              / o
+                HEX         6e              / n
+                HEX         65              / e
+                HEX         6e              / n
+                HEX         74              / t
+                HEX         73              / s
+                HEX         2e              / .
+                HEX         5C              / EOS
+
+uniStackAddr,   HEX         4E
+uniStack,       HEX         0
+                HEX         0
+                HEX         0
+                HEX         0
+                HEX         0
+                HEX         0
+                HEX         0
+
+exitMsgAddr,    HEX         56
+exitMsg,        HEX         A           / New line
+                HEX         65          / E
+                HEX         78          / x
+                HEX         69          / i
+                HEX         74          / t
+                HEX         20
+                HEX         63          / c
+                HEX         6f          / o
+                HEX         64          / d
+                HEX         65          / e
+                HEX         3a          / :
+                HEX         20
+                HEX         5C          / EOS
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////                MAIN CODE               ////////////////////
+////////////////////////////////////////////////////////////////////////////////
+main,           HEX			A00
+				Input
+                Store       x               / x = input()
+                Load        startXAddr
+                Store       printPNext
+                JnS         printf          / printf("%s", startX);
+                Load        x
+                Store       printPNext
+                Load        Ld
+                Store       printPMode       / print as an integer
+                JnS         printf          / printf("%d", x)
+                Load        uniNewLine
+                Output
+mainIfCond,     Load        x               / Load x
+                Subt        N5
+                Skipcond    000             / Check if x is less than 5
+                Jump        mainGte5        / If greater that 5
+                Jump        mainLt5         / If less than 5
+mainLt5,        Load        x               / Load X into acc
+                Subt        N2              / Subtract 2 from acc
+                Store       y               / Store acc into Y
+                Load        N20             / Load xstart into acc
+                Store       x               / Store Xs into X
+                Jump        mainEndIF
+mainGte5,       Load        x               / Load X into acc
+                Store       powPbase        / Store value of acc into A
+                Load        N3              / Load THREE into acc
+                Store       powPexp         / Store value of acc into B
+                JnS         pow             / Calculate x ^ 3
+                Store       mulP1           / Store it in p1
+                Load        Neg1            / Load -1
+                Store       mulP2           / Store it in p2
+                JnS         mult            / Calculate p1 * p2
+                Store       y               / Set y = -1 * (x ^ 3)
+                Load        N8              / Load the value 8
+                Store       x               / Set x = 8
+                Jump        mainEndIF
+mainEndIF,      Clear
+                Load        printXAddr
+                Store       printPNext
+                JnS         printf          / printf("%s", printX)
+                Load        x
+                Store       printPNext
+                Load        Ld
+                Store       printPMode
+                JnS         printf          / printf("%d", x)
+                Load        printYAddr
+                Store       printPNext
+                JnS         printf          / printf("%s", printY)
+                Load        y
+                Store       printPNext
+                Load        Ld
+                Store       printPMode
+                JnS         printf          / printf("%d", y)
+mainEnd,        Load        N0
+                Store       return          / Set return value as 0
+                JumpI       main            / Exit from main
+x,              DEC         20
+y,              DEC         0
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////            HELPER FUNCTIONS            ////////////////////
+////////////////////////////////////////////////////////////////////////////////
+/ Input:
+/   mulP1 - The first integer
+/   mulP2 - The second integer
+/ Output: The result of the multiplication
+mult,           HEX         A00
+                Load        N0              / Set the current value as 0
+                Store       mulVal          / Store it in the current value
+                Load        mulP1           / Load the input p1
+                Skipcond    400
+                Jump        multLoopCond    / if 0, jump to end and return 0
+                Jump        multEnd
+multLoopCond,   Load        mulP2           / Load the input p2
+                Skipcond    400
+                Jump        multLoopBody
+                Jump        multEnd         / if 0, jump to end and return 0
+multLoopBody,   Load        mulP2           / Load the second value into the register
+                Skipcond    000
+                Jump        multPos         / If the value is positive
+                Jump        multNeg         / If the value is negative
+multNeg,        Load        mulVal
+                Subt        mulP1           / Subtract p1 from the accumulated value
+                Store       mulVal          / Store it as the new value
+                Load        mulP2           / Load p2
+                Add         N1
+                Store       mulP2           / p2++
+                Jump        multLoopCond
+multPos,        Load        mulVal
+                Add         mulP1           / Add p1 to the accumulated value
+                Store       mulVal          / Store it as the new value
+                Load        mulP2           / Load p2
+                Subt        N1
+                Store       mulP2           / P2--
+                Jump        multLoopCond
+multEnd,        Load        mulVal          / Load the accumulated value
+                Store       return          / Set it as the return value
+                Clear
+                Store       mulP1
+                Store       mulP2
+                Store       mulVal
+                Load        return
+                JumpI       mult            / Exit from the subroutine
+mulP1,          DEC         0               / Param: a
+mulP2,          DEC         0               / Param: b
+mulVal,         DEC         0               / The working value returned
+
+/ Input:
+/   powPbase - The base for the operation
+/   powPexp - The exponent for the operation
+/ Output: Integer result of the exponent operation
+/ NOTE: MARIE doesn't support FP numbers, so throw an error when exponent is negative.
+pow,            HEX         A00
+                Load        N1
+                Store       powVal          / Let powVal = 1
+                Load        powPexp         / Load the exponent
+                Skipcond    000	            / Chec if it's less than 0
+                Jump        powLoopCond     / If it isn't, jump to the loop
+                Jump        powErr          / If it's less than 0, jump to throw and error
+powLoopCond,    Load        powPexp         / Load the exponent
+                Skipcond    400             / Check if it's 0
+                Jump        powLoopBody
+                Jump        powEnd
+powLoopBody,    Load        powPbase        / Load the base
+                Store       mulP1           / Store it in p1
+                Load        powVal          / Load the accumulated value
+                Store       mulP2           / Store it in p2
+                JnS         mult            / Calculate p1 * p2
+                Store       powVal          / Store it as the new accumulated value
+                Load        powPexp            / Load the exponent
+                Subt        N1
+                Store       powPexp            / pExp--
+                Jump        powLoopCond     / Go back to loop condition
+powErr,         Load        powErrAddr      / Load the error mesage's starting address
+                Store       printPNext       / Store it as the address for printf
+                JnS         printf          / Output the error message
+                Load        N1
+                Store       exitPCode        / Set the program exit code to 1
+                Jump        exit            / Jump to exit the program with an error
+powEnd,         Load        powVal          / Load the accumulated value
+                Store       return          / Store it in the return address
+                Clear
+                Store       powVal
+                Store       powPbase
+                Store       powPexp
+                Load        return
+                JumpI       pow             / Exit from the subroutine
+powPbase,       DEC         0               / Param: The base for the calculation
+powPexp,        DEC         0               / Param: The exponent to raise to
+powVal,         DEC         0               / The current working value returned
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////             OUT OF SCOPE               ////////////////////
+////////////////////////////////////////////////////////////////////////////////
+/ Input:
+/   - divPdivisor: The divisor to use to perform the calculation
+/   - divPdividend: The dividend to use to perform the calculation
+/ Output:
+/   The result of the integer division - either the quotient or the remainder
+/ NOTE:
+/ This code is NOT mine. Since it's out of scope of the assignment, it's from stackoverflow:
+/ https://stackoverflow.com/questions/41989768/marie-asm-lang-division-on-integers-positive-negative
+divide,         HEX         A00
+                JnS         longDivision
+                Load        divVal
+                Store       return
+                Clear
+                Store       divVal
+                Store       divRem
+                Load        return
+                JumpI       divide
+
+mod,            HEX         A00
+                JnS         longDivision
+                Load        divRem
+                Store       return
+                Clear
+                Store       divVal
+                Store       divRem
+                Load        return
+                JumpI       mod
+
+longDivision,   HEX         A00
+                Clear
+                Store       divQflag
+                Store       divRflag
+                Store       divVal
+                Subt        divPdividend
+                Skipcond    800
+                Jump        lddivendWasPos
+                Store       divPdividend
+                Store       divQflag
+                Store       divRflag
+lddivendWasPos, Clear
+                Subt        divPdivisor
+                Skipcond    400
+                Jump        ldDivisorNot0
+                Halt                      / division by zero detected, error
+ldDivisorNot0,  Skipcond    800
+                Jump        ldDivisorWasP
+                Store       divPdivisor            / (-divisor) positive, rewrite original Y
+    / flip quotient flag value (zero <-> nonzero) ("nonzero" == X)
+                Load        divPdividend                / will not "flip" anything when 0 == X
+                Subt        divQflag           / but then q = 0, so it's harmless deficiency
+                Store       divQflag           / q_flag is now zero or positive (X) value
+ldDivisorWasP,  Load        divPdividend
+                Store       divRem
+ldLoopCond,     Subt        divPdivisor
+                Skipcond    800
+                Jump        ldEndLoop
+ldLoopBody,     Store       divRem
+                Load        divVal
+                Add         N1
+                Store       divVal
+                Load        divRem
+                Jump        ldLoopCond
+ldEndLoop,      Skipcond    400
+                Jump        ldEnd
+                Store       divRem
+                Load        divVal
+                Add	        N1
+                Store       divVal
+ldAdjQuoSign,   Load        divQflag
+                Skipcond    800
+                Jump        ldAdjRemSign
+                Clear
+                Subt        divVal
+                Store       divVal           / quotient = -quotient
+ldAdjRemSign,   Load        divRflag
+                Skipcond    800
+                Jump        ldEnd
+                Clear
+                Subt        divRem
+                Store       divRem           / remainder = -remainder
+ldEnd,          Clear
+                Store       divPdividend
+                Store       divPdivisor
+                JumpI       longDivision
+divPdividend,   DEC         0
+divPdivisor,    DEC         0
+divQflag,       DEC         0
+divRflag,       DEC         0
+divRem,         DEC         0
+divVal,         DEC         0
+
+/ Input:
+/   uniPnum - the number to convert and print in unicode
+/ Output: void
+uniPrinter,     HEX			A00
+				Load        uniStackAddr
+                Store       uniNext         / Set the next mem addr as the start addr
+                Load        uniPnum
+                Skipcond    000             / if pNum < 0
+                Jump        uniPLoopBody    /   else
+                Jump        uniPMakePos     /   then
+uniPMakePos,    Load        uniPnum
+                Store       uniIsNegative   / "boolean" indicating if pNum < 0
+                Clear
+                Subt        uniPnum
+                Store       uniPnum         / pNum = 0 - pNum (0 - (-x) = x)
+uniPLoopBody,   Load        uniPnum
+                Store       divPdividend    / Set pNum as dividend
+                Load        N10
+                Store       divPdivisor     / Set 10 as divisor
+                JnS         mod             / AC = mod(pNum, 10)
+                Add         uni0            / AC = AC + 48 (unicode 0)
+                StoreI      uniNext         / push it onto stack
+                Load        uniNext
+                Add         N1
+                Store       uniNext         / Move to next value in stack
+                Load        uniPnum
+                Store       divPdividend    / Set pNum is dividend
+                Load        N10
+                Store       divPdivisor     / Set 10 as divisor since assuming base 10
+                JnS	        divide          / AC = divide(pNum, 10)
+                Store       uniPnum         / pNum = AC
+uniPLoopCond,   Skipcond    400             / if pNum == 0
+                Jump        uniPLoopBody    /   else
+                Jump        uniPLoopEnd     /   then
+uniPLoopEnd,    Load        uniNext        / Since the memory address goes 1 too far
+                Subt        N1              / Subtract 1 from it
+                Store       uniNext
+                Load        uniIsNegative
+                Skipcond    000             / if uniIsNegative < 0
+                Jump        uniPopBody      /   else
+                Jump        uniPNeg         /   then
+uniPNeg,        Load        uniDash
+                Output                      / Output a single "-" before rest of number
+uniPopBody,     LoadI       uniNext        / Peek at top of stack
+                Output                      / Print the value
+                Load        uniNext        / \
+                Subt        N1              /  |>> Pop it off the stack
+                Store       uniNext        / /
+uniPopCond,     Load        uniNext
+                Subt        uniStackAddr
+                Skipcond    000             / if lUniAddr == lUniNext
+                Jump        uniPopBody      /   else
+                Jump        uniPrinterEnd   /   then
+uniPrinterEnd,  Clear
+                Store       uniNext
+                Store       uniDigit
+                Store       uniIsNegative
+                Store       uniPnum
+                JumpI       uniPrinter
+uniPnum,        DEC         0
+uniDigit,       DEC         0
+uniIsNegative,  DEC         0
+uniNext,        HEX         0
+
+/ Input:
+/   printNext - The starting mem addr of the string
+/   printMode -	The type of variable to be printing - s for String, n for Number
+/ Output: void
+printf,         Clear
+                Load        printPMode       / Load the mode that printf was called with
+                Subt        Ld
+                Skipcond    400
+                Jump        printfSCond     / If called to print a string
+                Jump        printfNBody     / If called to print a number
+printfNBody,    Clear
+                Load        printPNext
+                Store       uniPnum
+                JnS         uniPrinter      / delegate to the uniPrinter subroutine
+                Jump        endPrintf
+printfSCond,    Clear
+                AddI        printPNext       / Load next value into acc
+                Subt        nullTerm        / subtract the null terminator code
+                Skipcond    400             / Will only be 0 if the character is \
+                Jump        printfSBody     / If not \, continue to body of loop
+                Jump        endPrintf       / Otherwise, break from loop
+printfSBody,    Clear
+                AddI        printPNext       / Load the memory address into acc
+                Output                      / Print the character
+                Load        printPNext       / Load the next memory address
+                Add         N1              / Increment the address
+                Store       printPNext       / Store it in the next address pointer
+                Jump        printfSCond     / Go back to beginning of loop
+endPrintf,      Clear
+                Store       printPNext
+                Store       printPMode
+                JumpI       printf
+printPMode,     DEC         0           / Param: What's getting inputted, string or number
+printPNext,     DEC         0           / Param: first mem addr of string
+
+/ Input:
+/   exitCode - The exit code for the program. 0: pass, 1: fail (POSIX standard)
+/ Output: N/A, kills the program
+exit,           Clear
+                Load        exitMsgAddr     / Start a newline
+                Store       printPNext
+                JnS         printf
+                Load        exitPCode        / Load the exit code from memory
+                Store       printPNext
+                Load        Ld
+                Store       printPMode
+                JnS         printf
+                Halt
+exitPCode,      DEC         0                / Param: 0 - success, else - fail
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////                CONSTANTS               ////////////////////
+////////////////////////////////////////////////////////////////////////////////
+Neg1,           DEC         -1
+N0,             DEC         0
+N1,             DEC         1
+N2,             DEC         2
+N3,             DEC         3
+N5,             DEC         5
+N8,             DEC         8
+N10,            DEC         10
+N20,            DEC         20
+
+uni0,           HEX         30
+uniNewLine,     HEX         0A
+uniDash,        HEX         2D
+
+Ld,             HEX         64
+Ls,             HEX         73
+
+return,         DEC         0               / RESERVED - store return values
+nullTerm,       HEX         5C              / The null terminator character

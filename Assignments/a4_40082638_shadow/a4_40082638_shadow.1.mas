@@ -1,0 +1,27 @@
+////////////////////////////////////////////////////////////////////////////////
+///////////////////               QUESTION 1               /////////////////////
+////////////////////////////////////////////////////////////////////////////////
+/ Write the following code in MARIE assembly language:
+/ Sum=20;
+/ For X=10 to 1 do
+/   Sum=Sum-X;
+
+FOR,            Load        Sum                 / Load X into the accumulator
+                Subt        X                   / Subtract X from Sum
+                Store       Sum                 / Store the value back in Sum
+                Load        X                   / Load X into the accumulator
+                Subt        STEP                / Subtract 1 from X
+                Store       X                   / Store the value back into X
+                Skipcond    400                 / If the accumulator is 0
+                Jump        FOR                 / Back to beginning of loop
+                Jump        DONE                / Output and exit
+
+DONE,           Load        Sum                 / Load Sum back into accumulator
+                Output                          / Output the value of Sum
+                Halt                            / Exit
+
+/ Declaration
+STEP,           DEC         1                   / Step for my for loop
+X,              DEC         10                  / Starting value of loop counter
+Sum,            DEC         20                  / Starting value of sum
+

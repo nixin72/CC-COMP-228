@@ -1,0 +1,72 @@
+/ TEST
+                JnS         divide
+                Load        divVal
+                Output
+                Load        divRem
+                Output
+                Halt
+
+N1,             DEC         1
+divRem,         DEC         0
+divVal,         DEC         0
+qflag,          DEC         0
+rflag,          DEC         0
+pDividend,      DEC         40
+pDivisor,       DEC         3
+
+
+/ METHOD
+divide,         Clear
+                Store    	qflag
+                Store   	rflag
+                Store    	divVal
+                Subt     	pDividend
+                Skipcond 	800
+                Jump     	divendWasPos
+                Store    	pDividend
+                Store    	qflag
+                Store    	rflag
+divendWasPos,   Clear
+                Subt     	pDivisor
+                Skipcond 	400
+                Jump     	DivisorNotZero
+                HALT                      / division by zero detected, error
+DivisorNotZero, Skipcond 	800
+    			Jump     	DivisorWasPos
+    			Store    	pDivisor                / (-divisor) positive, rewrite original Y
+    / flip quotient flag value (zero <-> nonzero) ("nonzero" == X)
+    			Load     	pDividend                / will not "flip" anything when 0 == X
+    			Subt     	qflag           / but then q = 0, so it's harmless deficiency
+    			Store    	qflag           / q_flag is now zero or positive (X) value
+DivisorWasPos,  Load 		pDividend
+        		Store 		divRem
+WHILE,   		Subt 		pDivisor
+        		Skipcond 	800
+        		Jump 		CHECK
+DO,      		Store 		divRem
+				Load 		divVal
+        		ADD 		N1
+        		Store 		divVal
+        		Load 		divRem
+        		Jump 		WHILE
+CHECK,   		Skipcond 	400
+        		Jump 		divideEnd
+        		Store 		divRem
+        		Load 		divVal
+        		ADD 		N1
+        		Store 		divVal
+divAdjQuoSign, 	Load     	qflag
+    			Skipcond 	800
+    			Jump     	divAdjRemSign
+    			Clear
+    			Subt		divVal
+    			Store 		divVal           / quotient = -quotient
+divAdjRemSign,	Load 		rflag
+    			Skipcond 	800
+    			Jump     	divideEnd
+    			Clear
+				Subt		divRem
+				Store 		divRem           / remainder = -remainder
+divideEnd,		Clear
+				Load 		divVal
+                JumpI 		divide

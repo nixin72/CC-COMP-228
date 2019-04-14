@@ -1,0 +1,35 @@
+////////////////////////////////////////////////////////////////////////////////
+///////////////////               QUESTION 3               /////////////////////
+////////////////////////////////////////////////////////////////////////////////
+				ORG			000
+FOR, 			Load 		N0			/ Load Number 0 into acc
+                Store 		i			/ Set i to 0
+COND,			Subt 		N100		/ Subtract number 100 from i
+                Skipcond 	000
+                Jump  		break		/ if i < 100
+FBODY,			Load 		x			/ if i >= 100
+				Add 		i			/ Add i to x
+                Store 		x			/ x = x + 1
+COND2,			Subt 		N102		/ Substract number 102 from x
+                Skipcond 	000
+                Jump 		break		/ x > 102
+                Load 		i			/ x <= 102
+                Add 		N1 			/ Add 1 to x
+                Store 		i			/ i++
+                Jump 		COND		/ Jump back to loop condition
+break,			Load 		x			/ Load the value of X
+				Output					/ Output X to check value
+				Halt					/ Halt program
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////              DECLARATIONS              ////////////////////
+////////////////////////////////////////////////////////////////////////////////
+/ Constants
+N0,				DEC			0
+N1,				DEC			1
+N100,			DEC			100
+N102,			DEC			102
+
+/ Variables
+i,				DEC			0
+x, 				DEC			10
